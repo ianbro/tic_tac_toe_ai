@@ -66,36 +66,97 @@ public class Player {
 		}
 	}
 	
+	private ArrayList<Integer> immediateLosses;
+	private ArrayList<Integer> trickLosses;
+	public boolean checkIfLoss(Node child, int index){
+		
+		Node choice = child;
+		
+		if(checkImmediateLoss(choice)){
+			immediateLosses.add(index);
+			return true;
+		}
+		
+		if(checkTrickLoss(choice)){
+			trickLosses.add(index);
+			return true;
+		}
+		
+		if(checkFutureTrickLoss(choice)){
+			trickLosses.add(index);
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean checkImmediateLoss(Node choice){
+		for(int j = 0; j < choice.children.size(); j ++){
+			//oponent move
+			Node choiceImmediateOutcomes = choice.children.get(j);
+			if(choice.children.get(j).score == -10){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean checkTrickLoss(Node choice){
+		for(int j = 0; j < choice.children.size(); j ++){
+			Node choiceImmediateOutcomes = choice.children.get(j);
+			int lossNum = 0;
+			for(int k = 0; k < choiceImmediateOutcomes.children.size(); k ++){
+				//cpu move
+				Node choice2 = choiceImmediateOutcomes.children.get(k);
+				if(checkImmediateLoss(choice2)){
+					lossNum ++;
+				}
+			}
+			if(lossNum > 1){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public String thinkForMove(){
 		if(this.mind == null){
 			return null;
 		}
 		else{
-			this.mind.updateLastMove(Play.game.lastMove);
+			ArrayList<Integer> secondary = new ArrayList<Integer>();
+			immediateLosses = new ArrayList<Integer>();
+			trickLosses = new ArrayList<Integer>();
 			HashMap<Integer, Integer> scoresTotal = new HashMap<Integer, Integer>();
 			ArrayList<Integer> losses = new ArrayList<Integer>();
+
+			this.mind.updateLastMove(Play.game.lastMove);
+			
+			//if the choice will result in a win, move there
 			for(int i = 0; i < this.mind.choices.size(); i ++){
 				Node choice = this.mind.choices.get(i);
 				if(choice.score == 10){
 					return choice.square.toString();
 				}
 			}
+			
+			//check to see what the losses are and put them in the immediateLosses arraylist or trickLoss arraylist
 			for(int i = 0; i < this.mind.choices.size(); i ++){
 				Node choice = this.mind.choices.get(i);
 				boolean loss = false;
-				for(int j = 0; j < choice.children.size(); j ++){
-					if(choice.children.get(j).score == -10){
-						losses.add(i);
-						loss = true;
-					}
-				}
+				loss = checkIfLoss(choice, i);
 				if(!loss){
 					scoresTotal.put(i, choice.totalBranchFromHere());
 					System.out.println(choice.totalBranchFromHere());
 				}
 			}
-			for(Integer loss: losses){
-				this.mind.choices.remove(loss);
+			
+
+			for(int i = 0; i < this.mind.choices.size(); i ++){
+				Node choice = this.mind.choices.get(i);
+				if(choice.square.contains("1")){
+					secondary.add(i);
+					scoresTotal.remove(i);
+				}
 			}
 			
 			Random rand = new Random();
@@ -104,14 +165,21 @@ public class Player {
 			int max = -1000000000;
 		    int choiceIndex = randomNum;
 		    
-		    System.out.println(scoresTotal.keySet().toString());
 			for(int index : scoresTotal.keySet()){
 				int score = scoresTotal.get(index);
 				if(score > max){
 					max = score;
 					choiceIndex = index;
 				}
-				System.out.println(index);
+			}
+			if(max == -1000000000){
+				if(trickLosses.size() > 0){
+					choiceIndex = trickLosses.get(0);
+				}
+				else{
+					choiceIndex = immediateLosses.get(0);
+				}
+				max = this.mind.choices.get(choiceIndex).totalBranchFromHere();
 			}
 			System.out.println(randomNum + "/" + choiceIndex + ":" + max);
 			return this.mind.choices.get(choiceIndex).square;

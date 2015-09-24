@@ -60,7 +60,8 @@ public class Tree {
 		String str = "";
 		str = str + "================================================================\n";
 		for(Node child : this.choices){
-			str = str + "" + Arrays.deepToString(child.state.board.squares) + "\n";
+//			str = str + "" + Arrays.deepToString(child.state.board.squares) + "\n";
+			str = str + child.toString() + "\n";
 		}
 		str = str + "================================================================\n";
 		str = str + "================================================================";

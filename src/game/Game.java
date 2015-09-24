@@ -36,6 +36,7 @@ public final class Game {
 		String move = p.thinkForMove();
 		if(move != null){
 			p.move(move, this);
+			p.mind.pullNodeUp(Integer.valueOf(String.valueOf(move.charAt(0))), Integer.valueOf(String.valueOf(move.charAt(1))));
 		}
 		else{
 			p.move(JOptionPane.showInputDialog("Square:"), this);
