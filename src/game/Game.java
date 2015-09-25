@@ -155,12 +155,14 @@ public final class Game {
 				this.player1 = new Player(team, name);
 				if(name.equals("CPU")){
 					player1.setAI();
+					player1.mind.teamNum = 1;
 				}
 			}
 			else{
 				this.player2 = new Player(team, name);
 				if(name.equals("CPU")){
 					player2.setAI();
+					player2.mind.teamNum = 2;
 				}
 			}
 		}
