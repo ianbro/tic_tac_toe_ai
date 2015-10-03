@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import ai.Node;
-import ai.Tree;
+import ai.NodeTemp;
+import ai.TreeTemp;
 import miniMax.Play;
 
 public class Player {
 
 	public char team;
 	public String name;
-	public Tree mind;
+	public TreeTemp mind;
 	public boolean isAI = false;
 	
 	public Player(char team, String name){
@@ -24,7 +24,7 @@ public class Player {
 	
 	public void setAI(){
 		if(this.name.equalsIgnoreCase("CPU")){
-			this.mind = new Tree(this.team);
+			this.mind = new TreeTemp(this.team);
 			this.isAI = true;
 		}
 	}
@@ -71,9 +71,7 @@ public class Player {
 			return null;
 		}
 		else{
-//			System.out.println(this.mind.childrenToString());
-		    this.mind.orderChildrenByDepth();
-		    int choiceIndex = 0;
+		    int choiceIndex = this.mind.getBestChoice();
 		    System.out.println(this.mind.childrenToString());
 			return this.mind.choices.get(choiceIndex).square;
 		}

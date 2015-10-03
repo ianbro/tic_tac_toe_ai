@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
-import ai.Node;
+import ai.NodeTemp;
 import game.Game;
 
 public abstract class Play {

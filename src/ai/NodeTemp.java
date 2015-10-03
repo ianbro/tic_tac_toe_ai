@@ -8,21 +8,21 @@ import game.Board;
 import game.Game;
 import game.Player;
 
-public class Node implements Comparable<Node>{
+public class NodeTemp implements Comparable<NodeTemp>{
 	
 	private char team;
 	public String square;
 	public Game state = new Game();
 	public int score;
 	public int turn;
-	public Tree hostTree;
-	public Node parentNode;
+	public TreeTemp hostTree;
+	public NodeTemp parentNode;
 	public int depth;
-	public ArrayList<Node> children = new ArrayList<Node>();
+	public ArrayList<NodeTemp> children = new ArrayList<NodeTemp>();
 	
 	private HashMap<Character, Integer> scoresMap = new HashMap<Character, Integer>();
 	
-	public Node(int depth, Game last_state, int rowNum, int colNum, char team, Tree hostTree, Node parentNode){
+	public NodeTemp(int depth, Game last_state, int rowNum, int colNum, char team, TreeTemp hostTree, NodeTemp parentNode){
 		this.state = last_state.copy();
 		this.team = team;
 		this.square = rowNum + "" + colNum;
@@ -44,7 +44,7 @@ public class Node implements Comparable<Node>{
 			for(int rowNum = 0; rowNum < this.state.board.squares.length; rowNum ++){
 				for(int colNum = 0; colNum < this.state.board.squares.length; colNum ++){
 					if(this.state.board.squares[rowNum][colNum] == ' '){
-						Node choice = new Node(this.depth, this.state, rowNum, colNum, this.team, this.hostTree, this);
+						NodeTemp choice = new NodeTemp(this.depth, this.state, rowNum, colNum, this.team, this.hostTree, this);
 						choice.generateNodes();
 						this.children.add(choice);
 					}
@@ -58,58 +58,37 @@ public class Node implements Comparable<Node>{
 		return square;
 	}
 	
-	public int getSoonestWin(){
-		if(this.score > 10){
-			return this.depth;
+	public int getBest(){
+		if(this.score > 0){
+			return this.score;
+		}
+		else if(this.score < -10){
+			return this.score;
+		}
+		else if(this.children.size() == 0){
+			return this.score;
 		}
 		else{
-			int best = 9;
-			if(this.parentNode == null){
-				best = 9;
+			this.children.sort(null);
+			int best;
+			if((this.depth%2)+1 != this.hostTree.teamNum){
+				best = 10;
 			}
-			else {
-				best = 9;
+			else{
+				best = -30;
 			}
 			for(int i = 0; i < this.children.size(); i ++){
-				if(this.children.get(i).score > 10 && this.children.get(i).depth > best){
-					int temp = 9;
-					if((this.children.get(i).depth%2)+1 == 3-this.hostTree.teamNum){
-						temp = this.getSoonestLoss();
-					}
-					else{
-						temp = this.children.get(i).getSoonestWin();
-					}
+				NodeTemp child = this.children.get(i);
+				int temp = child.getBest();
+				if((this.depth%2)+1 != this.hostTree.teamNum){
+					// if this is the opponents turn, choose the worst outcome
 					if(temp < best){
 						best = temp;
 					}
 				}
-			}
-			return best;
-		}
-	}
-	
-	public int getSoonestLoss(){
-		if(this.score < -10){
-			return this.depth;
-		}
-		else{
-			int best = 9;
-			if(this.parentNode == null){
-				best = 9;
-			}
-			else {
-				best = 9;
-			}
-			for(int i = 0; i < this.children.size(); i ++){
-				if(this.children.get(i).score < -10 && this.children.get(i).depth < best){
-					int temp = 9;
-					if((this.children.get(i).depth%2)+1 == 3-this.hostTree.teamNum){
-						temp = this.getSoonestLoss();
-					}
-					else{
-						temp = this.children.get(i).getSoonestWin();
-					}
-					if(temp < best){
+				else {
+					// if this is THIS turn, choose the best outcome
+					if(temp > best){
 						best = temp;
 					}
 				}
@@ -121,7 +100,7 @@ public class Node implements Comparable<Node>{
 	public int indexInChildrenOf(int rowNum, int colNum){
 		//finds the child that made the move of the given row and column
 		for(int i = 0; i < this.children.size(); i++){
-			Node child = this.children.get(i);
+			NodeTemp child = this.children.get(i);
 			if(child.state.board.squares[rowNum][colNum] != ' '){
 				for(int j = 0; j < this.children.size(); j ++){
 					if(this.children.get(j).state.board.squares[rowNum][colNum] == child.state.board.squares[rowNum][colNum] && j != i){
@@ -136,7 +115,7 @@ public class Node implements Comparable<Node>{
 	
 	public int totalBranchFromHere(){
 		int total = this.score;
-		for(Node child : this.children){
+		for(NodeTemp child : this.children){
 			total += child.score;
 			if(child.children.size() > 0){
 				total += child.totalBranchFromHere();
@@ -175,7 +154,7 @@ public class Node implements Comparable<Node>{
 	public String childrenToString(){
 		String str = "";
 		str = str + "================================================================\n";
-		for(Node child : this.children){
+		for(NodeTemp child : this.children){
 			str = str + "" + Arrays.deepToString(child.state.board.squares) + "\n";
 		}
 		str = str + "================================================================\n";
@@ -204,7 +183,7 @@ public class Node implements Comparable<Node>{
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(Node o) {
+	public int compareTo(NodeTemp o) {
 		// TODO Auto-generated method stub
 		return this.score - o.score;
 	}
