@@ -41,4 +41,8 @@ public class Mind extends Tree<Game> {
 		int colNum = Integer.valueOf(String.valueOf(place.charAt(1)));
 		this.pullUpChild(((Option) this.anchor).indexInChildrenOf(rowNum, colNum));
 	}
+	
+	public int getBestChoice(){
+		return 0;
+	}
 }

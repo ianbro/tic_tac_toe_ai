@@ -38,8 +38,8 @@ public class Option extends Node<Game>{
 		this.square = rowNum + "" + colNum;
 		
 		this.setScoresMap();
-//		this.placePeice();
-//		this.setScore();
+		this.placePeice();
+		this.setScore();
 	}
 	
 	public void generateNodes(){
@@ -108,6 +108,17 @@ public class Option extends Node<Game>{
 		else{
 			this.score = scoreTemp - this.depth;
 		}
+	}
+	
+	public int totalBranchFromHere(){
+		int total = this.score;
+		for(Node<Game> child : this.children){
+			total += ((Option) child).score;
+			if(child.children.size() > 0){
+				total += ((Option) child).totalBranchFromHere();
+			}
+		}
+		return total;
 	}
 	
 	public String toString(){

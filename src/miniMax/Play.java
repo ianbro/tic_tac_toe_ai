@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
-import ai.NodeTemp;
 import game.Game;
 
 public abstract class Play {
@@ -20,7 +19,7 @@ public abstract class Play {
 		game.setPlayer(null, '-');
 		System.out.println(game.player1);
 		System.out.println(game.player2);
-		game.player2.mind.generateTree(game);
+		game.player2.mind.generateTree();
 		System.out.println("Start!");
 
 		while(true){

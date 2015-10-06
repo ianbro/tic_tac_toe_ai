@@ -2,6 +2,9 @@ package game;
 
 import javax.swing.JOptionPane;
 
+import ai.Option;
+import iansLibrary.data.structures.tree.TreePath;
+
 
 public final class Game {
 
@@ -36,7 +39,7 @@ public final class Game {
 		String move = p.thinkForMove();
 		if(move != null){
 			p.move(move, this);
-			p.mind.pullNodeUp(Integer.valueOf(String.valueOf(move.charAt(0))), Integer.valueOf(String.valueOf(move.charAt(1))));
+			p.mind.pullUpChild(((Option) p.mind.anchor).indexInChildrenOf(Integer.valueOf(String.valueOf(move.charAt(0))), Integer.valueOf(String.valueOf(move.charAt(1)))));
 		}
 		else{
 			p.move(JOptionPane.showInputDialog("Square:"), this);
