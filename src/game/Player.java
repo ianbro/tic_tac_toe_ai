@@ -71,6 +71,7 @@ public class Player {
 			return null;
 		}
 		else{
+			this.mind.updateLastMove(Play.game.lastMove);
 		    int choiceIndex = this.mind.getBestChoice();
 		    System.out.println(this.mind.anchor.childrenToString());
 			return ((Option) this.mind.anchor.children.get(choiceIndex)).square;

@@ -3,13 +3,17 @@
  */
 package ai;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LongSummaryStatistics;
 
 import game.Game;
 import game.Player;
 import iansLibrary.data.structures.tree.Node;
 import iansLibrary.data.structures.tree.Tree;
+import iansLibrary.data.structures.tree.TreePath;
+import miniMax.Play;
 
 /**
  * @author Ian
@@ -17,7 +21,7 @@ import iansLibrary.data.structures.tree.Tree;
  * @project tic_tac_toe_ai
  * @todo TODO
  */
-public class Option extends Node<Game>{
+public class Option extends Node<Game> implements Comparable<Option>{
 	
 	private char team;
 	public String square;
@@ -32,7 +36,7 @@ public class Option extends Node<Game>{
 	 * @param hostTree
 	 * @param value
 	 */
-	public Option(Game last_state, int rowNum, int colNum, char team, Tree<Game> hostTree, Option parentNode){
+	public Option(Game last_state, int rowNum, int colNum, char team, Mind hostTree, Option parentNode){
 		super(parentNode, 9, hostTree, last_state);
 		this.team = team;
 		this.square = rowNum + "" + colNum;
@@ -42,12 +46,19 @@ public class Option extends Node<Game>{
 		this.setScore();
 	}
 	
+	public Option(Integer limit, Mind hostTree, Game currentState){
+		super(9, hostTree, currentState);
+		
+		this.setScoresMap();
+		this.setScore();
+	}
+	
 	public void generateNodes(){
 		if(this.score == 0){
 			for(int rowNum = 0; rowNum < this.value.board.squares.length; rowNum ++){
 				for(int colNum = 0; colNum < this.value.board.squares.length; colNum ++){
 					if(this.value.board.squares[rowNum][colNum] == ' '){
-						Option choice = new Option(this.value, rowNum, colNum, this.team, this.hostTree, this);
+						Option choice = new Option(this.value.copy(), rowNum, colNum, this.team, (Mind) this.hostTree, this);
 						choice.generateNodes();
 						this.children.add(choice);
 					}
@@ -58,7 +69,7 @@ public class Option extends Node<Game>{
 	
 	public int indexInChildrenOf(int rowNum, int colNum){
 		for(int i = 0; i < this.children.size(); i ++){
-			if(((Option) this.children.get(i)).square.equals(String.join(String.valueOf(rowNum), String.valueOf(colNum)))){
+			if(((Option) this.children.get(i)).square.equals(String.valueOf(rowNum) + String.valueOf(colNum))){
 				return i;
 			}
 		}
@@ -121,12 +132,111 @@ public class Option extends Node<Game>{
 		return total;
 	}
 	
+	public int getLastIndexInChildren(){
+		return this.children.size() - 1;
+	}
+	
+	public Integer getWinningIndexInChildren(){
+		for(int i = 0; i < this.children.size(); i ++){
+			if(((Option) this.children.get(i)).score > 10){
+				return i;
+			}
+		}
+		return null;
+	}
+	
+	public ArrayList<Integer> getIndexWillLose(){
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for(int i = 0; i < this.children.size(); i ++){
+			Option compChoice = ((Option) this.children.get(i));
+			if(compChoice.willLoseIfMovedHere()){
+				list.add(i);
+			}
+		}
+		return list;
+	}
+	
+	/**
+	 * Decides if this move allows oponent to win next turn
+	 * @return
+	 */
+	public boolean willLoseIfMovedHere(){
+		for(int j = 0; j < this.children.size(); j ++){
+			Option oponentChoice = ((Option) this.children.get(j));
+			if(oponentChoice.score < -10){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public Integer getTyingIndexInChildren(){
+		for(int i = 0; i < this.children.size(); i ++){
+			if(((Option) this.children.get(i)).score > 0 && ((Option) this.children.get(i)).score < 10){
+				return i;
+			}
+		}
+		return null;
+	}
+	
+	public boolean canWin(){
+		Integer winningMove = this.getWinningIndexInChildren();
+		if(winningMove == null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+	public boolean canTie(){
+		Integer tyingMove = this.getTyingIndexInChildren();
+		if(tyingMove == null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+	public TreePath getQuickestWin(){
+		
+		return null;
+	}
+	
+	/**
+	 * Decides if there is a move that can be made from here that will result in a loss. similar to {@link Option.willLoseIfMovedHere} but is evaluated one full turn of this computer before
+	 * @return
+	 */
+	public boolean canLose(){
+		ArrayList<Integer> losingMove = this.getIndexWillLose();
+		if(losingMove.size() == 0){
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	
+	public ArrayList<Integer> getAvailableIndexes(){
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for(int i = 0; i < this.children.size(); i ++){
+			list.add(i);
+		}
+		return list;
+	}
+	
 	public String toString(){
 		return this.team + ": " + this.square + " for " + this.score + " points ----------- Total: " + this.hostTree.getSize();
 	}
 	
 	public Game getGame(){
 		return this.value;
+	}
+	
+	@Override
+	public int compareTo(Option o){
+		return this.score - o.score;
 	}
 
 }

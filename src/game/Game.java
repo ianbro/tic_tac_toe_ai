@@ -39,6 +39,7 @@ public final class Game {
 		String move = p.thinkForMove();
 		if(move != null){
 			p.move(move, this);
+			System.out.println(Integer.valueOf(String.valueOf(move.charAt(0))) + ": " + Integer.valueOf(String.valueOf(move.charAt(1))));
 			p.mind.pullUpChild(((Option) p.mind.anchor).indexInChildrenOf(Integer.valueOf(String.valueOf(move.charAt(0))), Integer.valueOf(String.valueOf(move.charAt(1)))));
 		}
 		else{

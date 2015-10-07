@@ -3,9 +3,16 @@
  */
 package ai;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import game.Game;
 import iansLibrary.data.structures.tree.Node;
 import iansLibrary.data.structures.tree.Tree;
+import iansLibrary.data.structures.tree.TreePath;
 import miniMax.Play;
 
 /**
@@ -21,14 +28,14 @@ public class Mind extends Tree<Game> {
 	
 	public Mind(char team){
 		super();
-		super.setAnchor(new Node<Game>(9, this, Play.game.copy()));
+		super.setAnchor(new Option(9, this, Play.game.copy()));
 	}
 	
 	public void generateTree(){
 		for(int rowNum = 0; rowNum < this.anchor.value.board.squares.length; rowNum ++){
 			for(int colNum = 0; colNum < this.anchor.value.board.squares.length; colNum ++){
 				if(this.anchor.value.board.squares[rowNum][colNum] == ' '){
-					Option choice = new Option(this.anchor.value, rowNum, colNum, this.team, this, (Option) this.anchor);
+					Option choice = new Option(this.anchor.value.copy(), rowNum, colNum, this.team, this, (Option) this.anchor);
 					choice.generateNodes();
 					this.anchor.children.add(choice);
 				}
@@ -42,7 +49,61 @@ public class Mind extends Tree<Game> {
 		this.pullUpChild(((Option) this.anchor).indexInChildrenOf(rowNum, colNum));
 	}
 	
+	public ArrayList<Option> getAllStorageAsList(){
+		ArrayList<Option> allStore = new ArrayList<Option>();
+		Collection<ArrayList<Node<Game>>> depths = this.allStorage.values();
+		for(ArrayList<Node<Game>> group : depths){
+			for(Node<Game> option : group){
+				Option opt = ((Option) option);
+				allStore.add(opt);
+			}
+		}
+		return allStore;
+	}
+	
+	public boolean testPathForWin(TreePath path){
+		TreePath tempPath = new TreePath();
+		Option current = (Option) this.anchor;
+		tempPath.push(0);
+		do {
+			current.children.sort(null);
+			
+			if(current.depth%2 == this.teamNum -1){
+				tempPath.push(0);
+				current = (Option) current.getChild(0);
+			}
+			else{
+				tempPath.push(current.children.size()-1);
+				current = (Option) current.getChild(current.children.size()-1);
+			}
+		} while(path.size() != 1);
+		//now see if the two paths match
+		return false;
+	}
+	
 	public int getBestChoice(){
-		return 0;
+		ArrayList<Integer> loses;
+		ArrayList<Integer> okMoves = ((Option) this.anchor).getAvailableIndexes();
+		if(((Option) this.anchor).canWin()){
+			return ((Option) this.anchor).getWinningIndexInChildren();
+		}
+		else if(((Option) this.anchor).canTie()){
+			return ((Option) this.anchor).getTyingIndexInChildren();
+		}
+		else if(((Option) this.anchor).canLose()){
+			loses = ((Option) this.anchor).getIndexWillLose();
+			okMoves.removeAll(loses);
+		}
+		
+		ArrayList<Option> allStore = this.getAllStorageAsList();
+		allStore.sort(null);
+		
+		for(Option option : allStore){
+			if(this.testPathForWin(option.pathToThis)){
+				return option.pathToThis.peek();
+			}
+		}
+		
+		return okMoves.get(0);
 	}
 }
