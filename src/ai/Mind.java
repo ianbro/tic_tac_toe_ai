@@ -3,11 +3,8 @@
  */
 package ai;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import game.Game;
 import iansLibrary.data.structures.tree.Node;
@@ -41,6 +38,7 @@ public class Mind extends Tree<Game> {
 				}
 			}
 		}
+		this.findTraps();
 	}
 	
 	public void updateLastMove(String place){
@@ -65,7 +63,7 @@ public class Mind extends Tree<Game> {
 		TreePath tempPath = new TreePath();
 		Option current = (Option) this.anchor;
 		tempPath.push(0);
-		do {
+		while(tempPath.size() <= path.size()) {
 			current.children.sort(null);
 			
 			if(current.depth%2 == this.teamNum -1){
@@ -76,13 +74,18 @@ public class Mind extends Tree<Game> {
 				tempPath.push(current.children.size()-1);
 				current = (Option) current.getChild(current.children.size()-1);
 			}
-		} while(path.size() != 1);
+		}
 		//now see if the two paths match
-		return false;
+		if(path.equals(tempPath)){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 	
 	public int getBestChoice(){
-		ArrayList<Integer> loses;
+		ArrayList<Integer> loses = new ArrayList<Integer>();
 		ArrayList<Integer> okMoves = ((Option) this.anchor).getAvailableIndexes();
 		if(((Option) this.anchor).canWin()){
 			return ((Option) this.anchor).getWinningIndexInChildren();
@@ -100,10 +103,23 @@ public class Mind extends Tree<Game> {
 		
 		for(Option option : allStore){
 			if(this.testPathForWin(option.pathToThis)){
-				return option.pathToThis.peek();
+				return option.pathToThis.getDifferenceThisLonger(this.anchor.pathToThis).peek();
 			}
 		}
 		
-		return okMoves.get(0);
+		if(okMoves.size() > 0){
+			return okMoves.get(0);
+		}
+		else{
+			return loses.get(0);
+		}
+	}
+	
+	public void findTraps(){
+		for(Option option : this.getAllStorageAsList()){
+			if(option.walkingIntoTrap()){
+				option.score -= 50;
+			}
+		}
 	}
 }

@@ -156,6 +156,30 @@ public class Option extends Node<Game> implements Comparable<Option>{
 		return list;
 	}
 	
+	public boolean walkingIntoTrap(){
+		for(int i = 0; i < this.children.size(); i ++){
+			Option oponentChoice = (Option) this.getChild(i);
+			int count = 0;
+			for(int j = 0; j < oponentChoice.children.size(); j ++){
+				Option thisChoices2 = (Option) oponentChoice.getChild(j);
+				ArrayList<Integer> list = new ArrayList<Integer>();
+				for(int k = 0; k < thisChoices2.children.size(); k ++){
+					Option oponentChoice2 = ((Option) this.children.get(k));
+					if(oponentChoice2.score < -10){
+						list.add(k);
+					}
+				}
+				if(list.size() == thisChoices2.children.size()){
+					count ++;
+				}
+			}
+			if(count == oponentChoice.children.size()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Decides if this move allows oponent to win next turn
 	 * @return
