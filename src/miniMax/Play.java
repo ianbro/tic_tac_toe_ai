@@ -6,6 +6,7 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 
 import game.Game;
+import iansLibrary.data.structures.tree.Tree;
 import iansLibrary.data.structures.tree.TreePath;
 
 public abstract class Play {
@@ -14,7 +15,7 @@ public abstract class Play {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		
 		game = new Game();
 		game.setPlayer(null, '-');
 		game.setPlayer(null, '-');

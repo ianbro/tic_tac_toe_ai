@@ -4,6 +4,7 @@
 package ai;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import game.Game;
@@ -34,7 +35,7 @@ public class Mind extends Tree<Game> {
 				if(this.anchor.value.board.squares[rowNum][colNum] == ' '){
 					Option choice = new Option(this.anchor.value.copy(), rowNum, colNum, this.team, this, (Option) this.anchor);
 					choice.generateNodes();
-					this.anchor.children.add(choice);
+					this.anchor.addChild(choice);
 				}
 			}
 		}
@@ -66,7 +67,7 @@ public class Mind extends Tree<Game> {
 		while(tempPath.size() <= path.size()) {
 			current.children.sort(null);
 			
-			if(current.depth%2 == this.teamNum -1){
+			if(current.getDepth()%2 == this.teamNum -1){
 				tempPath.push(0);
 				current = (Option) current.getChild(0);
 			}
@@ -85,17 +86,34 @@ public class Mind extends Tree<Game> {
 	}
 	
 	public int getBestChoice(){
+		System.out.println("Thinking ========================================================================================= Thinking");
+		System.out.println(this.anchor.childrenToString());
+		System.out.println(this.anchor.getChild(0).getChild(0).getDepth());
 		ArrayList<Integer> loses = new ArrayList<Integer>();
 		ArrayList<Integer> okMoves = ((Option) this.anchor).getAvailableIndexes();
+		
+		System.out.println("Can I win?   " + ((Option) this.anchor).canWin());
+		System.out.println("Can I tie?   " + ((Option) this.anchor).canTie());
+		System.out.println("Can I lose?  " + ((Option) this.anchor).canLose());
+		
 		if(((Option) this.anchor).canWin()){
-			return ((Option) this.anchor).getWinningIndexInChildren();
+			int index = ((Option) this.anchor).getWinningIndexInChildren();
+			System.out.println("Winning Index:  " + index);
+			System.out.println("Done ================================================================================================= Done");
+			return index;
 		}
 		else if(((Option) this.anchor).canTie()){
-			return ((Option) this.anchor).getTyingIndexInChildren();
+			int index = ((Option) this.anchor).getTyingIndexInChildren();
+			System.out.println("Tying Index:    " + index);
+			System.out.println("Done ================================================================================================= Done");
+			return index;
 		}
 		else if(((Option) this.anchor).canLose()){
 			loses = ((Option) this.anchor).getIndexWillLose();
+			System.out.println("Losing Indexes:\n" + Arrays.toString(loses.toArray()));
+			System.out.println("OK moves before removing losses:\n" + Arrays.toString(okMoves.toArray()));
 			okMoves.removeAll(loses);
+			System.out.println("OK moves after removing losses:\n" + Arrays.toString(okMoves.toArray()));
 		}
 		
 		ArrayList<Option> allStore = this.getAllStorageAsList();
@@ -103,23 +121,36 @@ public class Mind extends Tree<Game> {
 		
 		for(Option option : allStore){
 			if(this.testPathForWin(option.pathToThis)){
-				return option.pathToThis.getDifferenceThisLonger(this.anchor.pathToThis).peek();
+				TreePath best = option.pathToThis.getDifferenceThisLonger(this.anchor.pathToThis);
+				System.out.println("Path to best Choice: " + this.anchor.pathToThis);
+				System.out.println("Path without anchor" + best);
+				System.out.println("Done ================================================================================================= Done");
+				return best.peek();
 			}
 		}
 		
 		if(okMoves.size() > 0){
+			int index = okMoves.get(0);
+			System.out.println("Move to go with after all evaluation: " + index);
+			System.out.println("Done ================================================================================================= Done");
 			return okMoves.get(0);
 		}
 		else{
-			return loses.get(0);
+			int index = loses.get(0);
+			System.out.println("Loss to go with after all evaluation: " + index);
+			System.out.println("Done ================================================================================================= Done");
+			return index;
 		}
 	}
 	
 	public void findTraps(){
 		for(Option option : this.getAllStorageAsList()){
+//			System.out.println(option);
+//			System.out.println(option.pathToThis);
 			if(option.walkingIntoTrap()){
 				option.score -= 50;
 			}
+//			System.out.println(option);
 		}
 	}
 }
