@@ -38,19 +38,8 @@ public class Option extends Node<Game> implements Comparable<Option>{
 	 */
 	public Option(Game last_state, int rowNum, int colNum, char team, Mind hostTree, Option parentNode){
 		super(parentNode, 9, hostTree, last_state);
-		System.out.println("creating");
-		System.out.println(this.parent.pathToThis.copy());
-		TreePath a = this.parent.pathToThis.copy();
-		a.push(5);
-		System.out.println(a);
-		a.push(6);
-		System.out.println(a);
-		System.out.println("Copying: " + a.copy());
 		this.team = team;
 		this.square = rowNum + "" + colNum;
-		System.out.println(this.parent.pathToThis);
-		System.out.println(this.pathToThis);
-		System.out.println(this.getDepth());
 		
 		this.setScoresMap();
 		this.placePeice();
@@ -168,32 +157,32 @@ public class Option extends Node<Game> implements Comparable<Option>{
 	}
 	
 	public boolean walkingIntoTrap(){
-//		if(this.pathToThis.equals(new TreePath(){{push(-1); push(0);}})){
-//			System.out.println(this.pathToThis);
-//			System.out.println(new TreePath(){{push(-1); push(0);}});
-//			System.out.println(this.pathToThis.equals(new TreePath(){{push(-1); push(0);}}));
-//			System.out.println(this.childrenToString());
-//		}
+		if(this.getDepth() == 2){
+			System.out.println(this.pathToThis);
+			System.out.println(new TreePath(){{push(-1); push(0);}});
+			System.out.println(this.pathToThis.equals(new TreePath(){{push(-1); push(0);}}));
+			System.out.println(this.childrenToString());
+		}
 		for(int i = 0; i < this.children.size(); i ++){
 			Option oponentChoice = (Option) this.getChild(i);
 			int count = 0;
-//			if(this.pathToThis.equals(new TreePath(){{push(-1); push(0);}})){
-//				System.out.println(this.value.board.toString());
-//				System.out.println(oponentChoice.childrenToString());
-//			}
+			if(this.getDepth() == 2){
+				System.out.println(this.value.board.toString());
+				System.out.println(oponentChoice.childrenToString());
+			}
 			for(int j = 0; j < oponentChoice.children.size(); j ++){
 				Option thisChoices2 = (Option) oponentChoice.getChild(j);
 				ArrayList<Integer> list = new ArrayList<Integer>();
-//				if(this.pathToThis.equals(new TreePath(){{push(-1); push(0);}})){
-//					System.out.println(thisChoices2.value.board.toString());
-//					System.out.println(thisChoices2.childrenToString());
-//				}
+				if(this.getDepth() == 2){
+					System.out.println(thisChoices2.value.board.toString());
+					System.out.println(thisChoices2.childrenToString());
+				}
 				for(int k = 0; k < thisChoices2.children.size(); k ++){
 					Option oponentChoice2 = ((Option) this.children.get(k));
-//					if(this.pathToThis.equals(new TreePath(){{push(-1); push(0);}})){
-//						System.out.println(oponentChoice2.value.board.toString());
-//						System.out.println(oponentChoice2.score);
-//					}
+					if(this.getDepth() == 2){
+						System.out.println(oponentChoice2.value.board.toString());
+						System.out.println(oponentChoice2.score);
+					}
 					if(oponentChoice2.score < -10){
 						list.add(k);
 					}
