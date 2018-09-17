@@ -10,10 +10,9 @@ import java.util.LongSummaryStatistics;
 
 import game.Game;
 import game.Player;
-import iansLibrary.data.structures.tree.Node;
-import iansLibrary.data.structures.tree.Tree;
-import iansLibrary.data.structures.tree.TreePath;
-import miniMax.Play;
+import com.ianmann.utils.data.structures.tree.Node;
+import com.ianmann.utils.data.structures.tree.Tree;
+import com.ianmann.utils.data.structures.tree.TreePath;
 
 /**
  * @author Ian
@@ -109,170 +108,15 @@ public class Option extends Node<Game> implements Comparable<Option>{
 	}
 	
 	public void setScore(){
-		int scoreTemp = scoresMap.get(this.value.checkWin());
-		if(scoreTemp < 0){
-			this.score = scoreTemp + this.getDepth();
-		}
-		else if(scoreTemp == 0){
-			this.score = scoreTemp;
-		}
-		else{
-			this.score = scoreTemp - this.getDepth();
-		}
-	}
-	
-	public int totalBranchFromHere(){
-		int total = this.score;
-		for(Node<Game> child : this.children){
-			total += ((Option) child).score;
-			if(child.children.size() > 0){
-				total += ((Option) child).totalBranchFromHere();
-			}
-		}
-		return total;
+		this.score = scoresMap.get(this.value.checkWin());
 	}
 	
 	public int getLastIndexInChildren(){
 		return this.children.size() - 1;
 	}
 	
-	public Integer getWinningIndexInChildren(){
-		for(int i = 0; i < this.children.size(); i ++){
-			if(((Option) this.children.get(i)).score > 10){
-				return i;
-			}
-		}
-		return null;
-	}
-	
-	public ArrayList<Integer> getIndexWillLose(){
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		for(int i = 0; i < this.children.size(); i ++){
-			Option compChoice = ((Option) this.children.get(i));
-			if(compChoice.willLoseIfMovedHere()){
-				list.add(i);
-			}
-		}
-		return list;
-	}
-	
-	public boolean walkingIntoTrap(){
-		if(this.getDepth() == 2){
-			System.out.println(this.pathToThis);
-			System.out.println(new TreePath(){{push(-1); push(0);}});
-			System.out.println(this.pathToThis.equals(new TreePath(){{push(-1); push(0);}}));
-			System.out.println(this.childrenToString());
-		}
-		for(int i = 0; i < this.children.size(); i ++){
-			Option oponentChoice = (Option) this.getChild(i);
-			int count = 0;
-			if(this.getDepth() == 2){
-				System.out.println(this.value.board.toString());
-				System.out.println(oponentChoice.childrenToString());
-			}
-			for(int j = 0; j < oponentChoice.children.size(); j ++){
-				Option thisChoices2 = (Option) oponentChoice.getChild(j);
-				ArrayList<Integer> list = new ArrayList<Integer>();
-				if(this.getDepth() == 2){
-					System.out.println(thisChoices2.value.board.toString());
-					System.out.println(thisChoices2.childrenToString());
-				}
-				for(int k = 0; k < thisChoices2.children.size(); k ++){
-					Option oponentChoice2 = ((Option) this.children.get(k));
-					if(this.getDepth() == 2){
-						System.out.println(oponentChoice2.value.board.toString());
-						System.out.println(oponentChoice2.score);
-					}
-					if(oponentChoice2.score < -10){
-						list.add(k);
-					}
-				}
-				if(list.size() == thisChoices2.children.size()){
-					count ++;
-				}
-			}
-			if(count == oponentChoice.children.size()){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Decides if this move allows oponent to win next turn
-	 * @return
-	 */
-	public boolean willLoseIfMovedHere(){
-		for(int j = 0; j < this.children.size(); j ++){
-			Option oponentChoice = ((Option) this.children.get(j));
-			if(oponentChoice.score < -10){
-				return true;
-			}
-		}
-		if(this.walkingIntoTrap()){
-			return true;
-		}
-		return false;
-	}
-	
-	public Integer getTyingIndexInChildren(){
-		for(int i = 0; i < this.children.size(); i ++){
-			if(((Option) this.children.get(i)).score > 0 && ((Option) this.children.get(i)).score < 10){
-				return i;
-			}
-		}
-		return null;
-	}
-	
-	public boolean canWin(){
-		Integer winningMove = this.getWinningIndexInChildren();
-		if(winningMove == null){
-			return false;
-		}
-		else{
-			return true;
-		}
-	}
-	
-	public boolean canTie(){
-		Integer tyingMove = this.getTyingIndexInChildren();
-		if(tyingMove == null){
-			return false;
-		}
-		else{
-			return true;
-		}
-	}
-	
-	public TreePath getQuickestWin(){
-		
-		return null;
-	}
-	
-	/**
-	 * Decides if there is a move that can be made from here that will result in a loss. similar to {@link Option.willLoseIfMovedHere} but is evaluated one full turn of this computer before
-	 * @return
-	 */
-	public boolean canLose(){
-		ArrayList<Integer> losingMove = this.getIndexWillLose();
-		if(losingMove.size() == 0){
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-	
-	public ArrayList<Integer> getAvailableIndexes(){
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		for(int i = 0; i < this.children.size(); i ++){
-			list.add(i);
-		}
-		return list;
-	}
-	
 	public String toString(){
-		return this.team + ": " + this.square + " for " + this.score + " points ----------- Total: " + this.hostTree.getSize();
+		return "(" + this.team + ": " + this.square + " for " + this.score + " points)";
 	}
 	
 	public Game getGame(){

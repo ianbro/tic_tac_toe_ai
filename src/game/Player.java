@@ -7,7 +7,6 @@ import java.util.Random;
 
 import ai.Option;
 import ai.Mind;
-import miniMax.Play;
 
 public class Player {
 
@@ -42,7 +41,7 @@ public class Player {
 	public void move(String place, Game game){
 		
 		if(place.length() != 2){
-			System.out.println("Please enter square in format 'a0'. Note: it is 0 indexed.");
+			System.out.println("Please enter square in format '00'. Note: it is 0 indexed.");
 			game.turn -= 1;
 		}
 		else{
@@ -60,7 +59,7 @@ public class Player {
 				}
 			} catch (IndexOutOfBoundsException e){
 				e.printStackTrace();
-				System.out.println("Please enter square in format 'a0'. Note: it is 0 indexed.\nThe first digit must range from 0 to 2 inclusive and so must the second digit");
+				System.out.println("Please enter square in format '00'. Note: it is 0 indexed.\nThe first digit must range from 0 to 2 inclusive and so must the second digit");
 				game.turn -= 1;
 			}
 		}
@@ -71,9 +70,7 @@ public class Player {
 			return null;
 		}
 		else{
-			System.out.println(this.mind.anchor.childrenToString());
 			this.mind.updateLastMove(Play.game.lastMove);
-			System.out.println(this.mind.anchor.childrenToString());
 		    int choiceIndex = this.mind.getBestChoice();
 			return ((Option) this.mind.anchor.children.get(choiceIndex)).square;
 		}

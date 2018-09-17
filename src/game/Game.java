@@ -2,8 +2,9 @@ package game;
 
 import javax.swing.JOptionPane;
 
+import ai.Mind;
 import ai.Option;
-import iansLibrary.data.structures.tree.TreePath;
+import com.ianmann.utils.data.structures.tree.TreePath;
 
 
 public final class Game {
@@ -28,24 +29,27 @@ public final class Game {
 	
 	public void nextTurn(){
 		
-		Player p;
-		if(this.turn%2 == 0){
-			p = player1;
-		}
-		else {
-			p = player2;
-		}
+		Player p = this.getCurrentPlayerToMove();
 		
 		String move = p.thinkForMove();
 		if(move != null){
 			p.move(move, this);
-			System.out.println(Integer.valueOf(String.valueOf(move.charAt(0))) + ": " + Integer.valueOf(String.valueOf(move.charAt(1))));
 			p.mind.pullUpChild(((Option) p.mind.anchor).indexInChildrenOf(Integer.valueOf(String.valueOf(move.charAt(0))), Integer.valueOf(String.valueOf(move.charAt(1)))));
 		}
 		else{
-			p.move(JOptionPane.showInputDialog("Square:"), this);
+			p.move(JOptionPane.showInputDialog("Square (ex. 21):"), this);
 		}
 		this.turn ++;
+	}
+	
+	public Player getCurrentPlayerToMove() {
+		Player p;
+		if (this.turn%2 == 0) {
+			p = player1;
+		} else {
+			p = player2;
+		}
+		return p;
 	}
 	
 	public boolean check(char team, int row, int col){
@@ -159,14 +163,14 @@ public final class Game {
 				this.player1 = new Player(team, name);
 				if(name.equals("CPU")){
 					player1.setAI();
-					player1.mind.teamNum = 1;
+					player1.mind = new Mind(team);
 				}
 			}
 			else{
 				this.player2 = new Player(team, name);
 				if(name.equals("CPU")){
 					player2.setAI();
-					player2.mind.teamNum = 2;
+					player2.mind = new Mind(team);
 				}
 			}
 		}
