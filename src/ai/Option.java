@@ -25,7 +25,6 @@ public class Option extends Node<Game> implements Comparable<Option>{
 	private char team;
 	public String square;
 	public int score;
-	public int turn;
 
 	private HashMap<Character, Integer> scoresMap = new HashMap<Character, Integer>();
 

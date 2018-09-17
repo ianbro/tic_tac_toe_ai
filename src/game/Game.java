@@ -37,7 +37,7 @@ public final class Game {
 			p.mind.pullUpChild(((Option) p.mind.anchor).indexInChildrenOf(Integer.valueOf(String.valueOf(move.charAt(0))), Integer.valueOf(String.valueOf(move.charAt(1)))));
 		}
 		else{
-			p.move(JOptionPane.showInputDialog("Square (ex. 21):"), this);
+			p.move(JOptionPane.showInputDialog("Turn " + this.turn + " Square (ex. 21):"), this);
 		}
 		this.turn ++;
 	}
@@ -161,17 +161,9 @@ public final class Game {
 		else{
 			if(team == 'X'){
 				this.player1 = new Player(team, name);
-				if(name.equals("CPU")){
-					player1.setAI();
-					player1.mind = new Mind(team);
-				}
 			}
 			else{
 				this.player2 = new Player(team, name);
-				if(name.equals("CPU")){
-					player2.setAI();
-					player2.mind = new Mind(team);
-				}
 			}
 		}
 	}

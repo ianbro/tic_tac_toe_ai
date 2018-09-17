@@ -55,7 +55,7 @@ public class Player {
 				}
 				else{
 					game.board.squares[rowNum][columnNum] = this.team;
-					Play.game.lastMove = place;
+					game.lastMove = place;
 				}
 			} catch (IndexOutOfBoundsException e){
 				e.printStackTrace();

@@ -44,17 +44,31 @@ public class Mind extends Tree<Game> {
 	}
 	
 	public void updateLastMove(String place){
+		if (place == null) {
+			return;
+		}
 		int rowNum = Integer.valueOf(String.valueOf(place.charAt(0)));
 		int colNum = Integer.valueOf(String.valueOf(place.charAt(1)));
 		this.pullUpChild(((Option) this.anchor).indexInChildrenOf(rowNum, colNum));
 	}
 	
+	/**
+	 * Runs the MinMax algorithm on a turn. This calls the static evaluator for each option in it's children
+	 * and returns the best result.
+	 * 
+	 * An example to this is that if the middle square is available, that is automatically returned. This is
+	 * hard coded but is the most favorable position to go.
+	 * @return
+	 */
 	public int getBestChoice(){
-		int bestChoice = 0;
+		int bestChoice = ((Option) this.anchor).indexInChildrenOf(1, 1);
+		
+		if (bestChoice != -1)
+			return bestChoice;
+		
 		int bestScore = -20;
 		for (int i = 0; i < this.anchor.children.size(); i ++) {
 			int optionScore = this.getScoreOfOption((Option) this.anchor.children.get(i));
-			System.out.println("Current Turn: " + this.anchor.value.turn);
 			if (optionScore > bestScore) {
 				bestChoice = i;
 				bestScore = optionScore;
@@ -69,18 +83,15 @@ public class Mind extends Tree<Game> {
 			adjustedScore = option.score;
 		}
 		else {
-			adjustedScore = 0;
+			if (option.getGame().getCurrentPlayerToMove().team == this.team)
+				adjustedScore = -20;
+			else
+				adjustedScore = 20;
 			for (int i = 0; i < option.children.size(); i ++) {
 				Option node = (Option) option.children.get(i);
 				int rawScore = this.getScoreOfOption(node);
 				if (rawScore < 0) rawScore ++;
 				else if (rawScore > 0) rawScore --;
-				if (node.getGame().turn == 3) {
-					System.out.println(node.getGame().board);
-					System.out.println("Raw Score for node: " + rawScore);
-					System.out.println(option.getGame().getCurrentPlayerToMove());
-					System.out.println("Team:" + this.team);
-				}
 				if (option.getGame().getCurrentPlayerToMove().team == this.team) {
 					if (rawScore > adjustedScore)
 						adjustedScore = rawScore;

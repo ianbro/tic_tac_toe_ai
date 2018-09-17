@@ -19,12 +19,16 @@ public abstract class Play {
 		game = new Game();
 		game.setPlayer(null, '-');
 		game.setPlayer(null, '-');
-		System.out.println(game.player1);
-		System.out.println(game.player2);
-		if (game.player1.isAI)
+		if (game.player1.name.equals("CPU")) {
+			game.player1.setAI();
+			System.out.println("Generating mind for player 1...");
 			game.player1.mind.generateTree();
-		if (game.player2.isAI)
+		}
+		if (game.player2.name.equals("CPU")) {
+			game.player2.setAI();
+			System.out.println("Generating mind for player 2...");
 			game.player2.mind.generateTree();
+		}
 		System.out.println("Start!");
 
 		while(true){
